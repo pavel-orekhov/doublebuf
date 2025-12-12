@@ -1,0 +1,41 @@
+# Compiled binaries and object files
+*.o
+*.a
+*.so
+*.out
+*.exe
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Build artifacts
+build/
+dist/
+*.dSYM/
+
+# Dependency files
+*.d
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+# Testing
+*.gcno
+*.gcda
+.coverage
+
+# Temporary files
+*.tmp
+*.bak
+.tmp/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
