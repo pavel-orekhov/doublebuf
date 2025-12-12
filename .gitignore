@@ -31,6 +31,10 @@ CMakeCache.txt
 *.gcda
 .coverage
 
+# Output files
+output.log
+*.log
+
 # Temporary files
 *.tmp
 *.bak
