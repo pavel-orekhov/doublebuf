@@ -2,7 +2,7 @@
 #define LOCKFREE_DB_CONFIG_H
 
 #ifndef BUFFER_CAPACITY
-#define BUFFER_CAPACITY 1024
+#define BUFFER_CAPACITY (100 * 1024 * 1024)
 #endif
 
 #ifndef WRITER_COUNT
@@ -10,7 +10,7 @@
 #endif
 
 #ifndef OUTPUT_FILE_PATH
-#define OUTPUT_FILE_PATH "output.log"
+#define OUTPUT_FILE_PATH "/tmp/(time_t).cap"
 #endif
 
 #ifndef DEBUG_MODE

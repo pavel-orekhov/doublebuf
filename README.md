@@ -1,151 +1,213 @@
-# Lock-Free Double Buffer Demo
+# Lock-Free Double Buffer System
 
-A high-performance, lock-free double buffer implementation for concurrent data processing in C11.
+A high-performance, lock-free double buffer implementation for concurrent data processing with multiple producer threads and a single consumer thread. Built with C11, GCC-13, and optimized for x86_64 Linux systems.
 
-## Goal
+## Architecture Overview
 
-This project demonstrates a lock-free double buffer pattern for handling concurrent writes from multiple threads while allowing a single reader thread to process accumulated data efficiently. The double buffer approach eliminates contention between writers and the reader, enabling high-throughput data collection with minimal synchronization overhead.
+The system implements a lock-free double buffer pattern that enables:
+- **Multiple Writer Threads**: Generate random data blocks (10-10000 bytes)
+- **Single Reader Thread**: Persist data to disk with auxiliary processing
+- **Lock-Free Operation**: Uses C11 atomic operations for thread synchronization
+- **High Performance**: Optimized for throughput with minimal latency
 
-### Key Features
+### Thread Workflow
 
-- **Lock-Free Design**: Writers operate without locks using atomic operations
-- **Zero-Copy Switching**: Efficient buffer swap mechanism
-- **Multiple Writers**: Support for concurrent writer threads
-- **Configurable**: Compile-time tunables for buffer capacity, thread count, and output
-- **C11 Standard**: Portable implementation using C11 atomics
+**Writer Thread Cycle:**
+```
+produce_data() → db_write() → account_data() → repeat
+```
+
+**Reader Thread Cycle:**
+```
+db_read() → disk_write() → aux_work() → repeat
+```
 
 ## Project Structure
 
 ```
-.
-├── src/              # Source files
-├── include/          # Header files and configuration
-├── examples/         # Example programs and use cases
-├── build/            # Build artifacts (generated)
-├── Makefile          # Build system
-└── README.md         # This file
+/home/engine/project/
+├── src/                    # Source files
+│   ├── main.c             # Main program with thread orchestration
+│   └── test.c             # Test suite
+├── include/                # Header files
+│   └── config.h           # Compile-time configuration
+├── docs/                   # Documentation (AI-driven development)
+│   ├── ARCHITECTURE.md    # System architecture overview
+│   ├── DESIGN_DECISIONS.md # Design rationale and trade-offs
+│   ├── SPECIFICATIONS/    # Detailed specifications
+│   │   ├── writer_spec.md # Writer thread specifications
+│   │   └── reader_spec.md # Reader thread specifications
+│   └── SESSION_NOTES.md   # Development session notes
+├── examples/               # Example programs (future)
+├── build/                  # Build artifacts (gitignored)
+├── Makefile               # Build system
+└── README.md              # This file
 ```
 
-## Prerequisites
+## Build System
 
-- GCC 13 or later
+### Prerequisites
+- GCC-13 or later
+- GNU Make
 - POSIX threads (pthread)
-- Linux/Unix environment
+- Linux x86_64 (optimized for this platform)
 
-## Build Instructions
-
-### Basic Build
-
-Build both the demo and test executables:
+### Build Targets
 
 ```bash
-make
+make              # Build demo and test executables (default)
+make demo         # Build demo executable only
+make test         # Build and run test suite
+make debug        # Build with debug flags (-g -O0 -DDEBUG_MODE=1)
+make sanitize     # Build with AddressSanitizer and UBSan
+make clean        # Remove build artifacts
+make help         # Display help message
 ```
 
-Or build them individually:
+### Build Configuration
 
-```bash
-make demo    # Build the demo executable
-make test    # Build and run tests
-```
-
-### Build Options
-
-The Makefile supports several build configurations:
-
-**Debug Build** (with symbols and no optimization):
-```bash
-make debug
-```
-
-**Sanitizer Build** (with AddressSanitizer and UndefinedBehaviorSanitizer):
-```bash
-make sanitize
-```
-
-**Clean Build**:
-```bash
-make clean
-```
-
-**Help**:
-```bash
-make help
-```
-
-## Running the Demo
-
-After building, run the demo executable:
-
-```bash
-./build/demo
-```
-
-The demo will display configuration settings and execute the lock-free double buffer demonstration.
-
-## Running Tests
-
-To build and run the test suite:
-
-```bash
-make test
-```
+The build system uses the following compiler flags:
+- **Standard**: `-std=c11 -O3 -march=native -Wall -Wextra -Wpedantic`
+- **Linking**: `-pthread`
+- **Debug**: `-g -O0 -DDEBUG_MODE=1`
+- **Sanitizers**: `-fsanitize=address,undefined -fno-omit-frame-pointer`
 
 ## Configuration
 
-The project uses compile-time configuration defined in `include/config.h`. You can override these settings by passing them as compiler flags:
+Compile-time configuration is managed through `include/config.h`:
 
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `BUFFER_CAPACITY` | 100MB | Total buffer memory size |
+| `WRITER_COUNT` | 4 | Number of producer threads |
+| `OUTPUT_FILE_PATH` | `/tmp/(time_t).cap` | Output file template |
+| `DEBUG_MODE` | 0 | Enable debug output |
+| `ENABLE_STATS` | 1 | Enable performance statistics |
+
+### Customizing Configuration
+
+Override defaults using make flags:
 ```bash
-make CFLAGS="-std=c11 -O3 -march=native -DBUFFER_CAPACITY=2048 -DWRITER_COUNT=8"
+make CFLAGS="-std=c11 -O3 -march=native -DBUFFER_CAPACITY=512MB"
 ```
 
-### Available Configuration Options
+## Usage
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `BUFFER_CAPACITY` | 1024 | Number of entries per buffer |
-| `WRITER_COUNT` | 4 | Number of concurrent writer threads |
-| `OUTPUT_FILE_PATH` | "output.log" | Path for output file |
-| `DEBUG_MODE` | 0 | Enable debug output (0 or 1) |
-| `ENABLE_STATS` | 1 | Enable statistics collection (0 or 1) |
+### Running the Demo
 
-## Compiler Flags
+```bash
+make demo
+./build/demo
+```
 
-The default build uses the following GCC flags:
+The demo will:
+1. Start configured number of writer threads
+2. Start a single reader thread
+3. Display system configuration
+4. Run until Enter is pressed
+5. Print final statistics
 
-- `-std=c11`: C11 standard compliance
-- `-O3`: Maximum optimization
-- `-march=native`: Optimize for the host CPU architecture
-- `-Wall -Wextra -Wpedantic`: Enable comprehensive warnings
-- `-pthread`: POSIX threads support
+### Example Output
 
-## Development
+```
+Lock-Free Double Buffer System
+==============================
+Configuration:
+  Buffer Capacity: 104857600 bytes (100.00 MB)
+  Writer Count:    4
+  Debug Mode:      disabled
+  Stats Enabled:   enabled
 
-### Adding New Features
+Writer thread 0 started
+Writer thread 1 started
+Writer thread 2 started
+Writer thread 3 started
+Reader thread started
+System running. Press Enter to shutdown...
+[Enter pressed]
 
-1. Place header files in `include/`
-2. Place implementation files in `src/`
-3. Place example programs in `examples/`
-4. Update the Makefile if adding new compilation units
+Writer thread 3 finished
+Writer thread 0 finished
+Writer thread 2 finished
+Reader thread finished
+Writer thread 1 finished
 
-### Code Style
+Final Statistics:
+  Blocks written: 1247
+  Bytes written:  6234567 (5.94 MB)
+  Read operations: 856
+  Bytes read:     4289123 (4.09 MB)
+System shutdown complete.
+```
 
-- Follow C11 standard
-- Use meaningful variable names
-- Keep functions focused and modular
-- Use atomic operations for lock-free synchronization
+## Implementation Status
 
-## Performance Considerations
+### ✅ Completed
+- [x] Project scaffold and documentation structure
+- [x] Thread orchestration and lifecycle management
+- [x] Random data generation for writers
+- [x] Statistics collection and reporting
+- [x] Configuration management
+- [x] Build system with multiple targets
+- [x] Comprehensive documentation for AI-driven development
 
-- The `-march=native` flag optimizes for your specific CPU
-- Buffer capacity should be tuned based on your workload
-- Writer count should typically match your available CPU cores
-- Use the sanitizer build during development to catch memory errors
+### 🔄 In Progress
+- [ ] Lock-free double buffer implementation (C11 atomics)
+- [ ] Actual disk I/O operations
+- [ ] Performance optimization and benchmarking
+- [ ] Comprehensive test suite
+
+### 📋 Planned
+- [ ] Memory pool allocation for performance
+- [ ] CPU affinity and thread prioritization
+- [ ] Real-time performance monitoring
+- [ ] Advanced auxiliary work functions
+- [ ] Cross-platform compatibility layers
+
+## Design Philosophy
+
+### Performance First
+- Lock-free algorithms to eliminate contention
+- Cache-aware data structures and alignment
+- Optimized for x86_64 architecture
+- Minimal memory copying and allocation
+
+### Documentation-Driven Development
+- Comprehensive specifications for AI implementation
+- Clear architectural boundaries and interfaces
+- Design rationale and decision documentation
+- Testing strategies and validation approaches
+
+### Production Readiness
+- Error handling and graceful degradation
+- Resource management and cleanup
+- Monitoring and debugging capabilities
+- Configuration flexibility
+
+## Development Documentation
+
+The `docs/` directory contains comprehensive documentation for AI-driven development:
+
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)**: System overview, components, and data flow
+- **[DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md)**: Rationale for key design choices
+- **[SPECIFICATIONS/writer_spec.md](docs/SPECIFICATIONS/writer_spec.md)**: Writer thread specifications
+- **[SPECIFICATIONS/reader_spec.md](docs/SPECIFICATIONS/reader_spec.md)**: Reader thread specifications
+- **[SESSION_NOTES.md](docs/SESSION_NOTES.md)**: Development session planning and context
+
+## Contributing
+
+This project follows a specification-driven development approach:
+
+1. **Review Documentation**: Start with `docs/ARCHITECTURE.md` and specifications
+2. **Understand Interfaces**: Focus on function prototypes and integration points
+3. **Implement Incrementally**: Build components in isolation, then integrate
+4. **Test Continuously**: Use `make test` for validation during development
+5. **Maintain Documentation**: Update docs as architecture evolves
 
 ## License
 
-To be determined.
+This project is part of a development exercise and follows the repository's licensing terms.
 
-## Authors
+---
 
-To be determined.
+**Note**: This is a scaffold implementation with stub functions for the lock-free double buffer. The core architecture and documentation are complete, ready for AI-driven implementation of the lock-free algorithms and performance optimizations.
