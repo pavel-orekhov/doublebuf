@@ -1,0 +1,16 @@
+@startuml
+actor Writer1
+actor Writer2
+actor WriterN
+rectangle "Front Buffer" as Front
+rectangle "Back Buffer" as Back
+rectangle "CAS Swap" as Swap
+actor Reader
+
+Writer1 --> Front
+Writer2 --> Front
+WriterN --> Front
+Front --> Swap
+Swap --> Back
+Back --> Reader
+@enduml
