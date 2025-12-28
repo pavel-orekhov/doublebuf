@@ -19,12 +19,21 @@
 build/
 dist/
 *.dSYM/
+.netlify/
 
 # Dependency files
 *.d
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
 
 # Testing
 *.gcno
