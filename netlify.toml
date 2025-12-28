@@ -1,0 +1,14 @@
+[functions]
+  node_bundler = "esbuild"
+  
+[[redirects]]
+  from = "/mcp/v1/encode-plantuml"
+  to = "/.netlify/functions/encode-plantuml"
+  status = 200
+  force = true
+  
+[[redirects]]
+  from = "/mcp/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true

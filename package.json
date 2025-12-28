@@ -1,0 +1,17 @@
+{
+  "name": "mcp-plantuml-encoder",
+  "version": "1.0.0",
+  "description": "Netlify Function for encoding PlantUML code to URLs",
+  "main": "netlify/functions/encode-plantuml.js",
+  "scripts": {
+    "test": "node test/encode-plantuml.test.js"
+  },
+  "keywords": [
+    "plantuml",
+    "netlify",
+    "serverless",
+    "mcp"
+  ],
+  "author": "",
+  "license": "MIT"
+}
