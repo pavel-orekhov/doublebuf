@@ -1,12 +1,26 @@
 [functions]
   node_bundler = "esbuild"
-  
+
+# MCP-compatible API routes
+[[redirects]]
+  from = "/api/tools"
+  to = "/.netlify/functions/tools-discovery"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/tools/*"
+  to = "/.netlify/functions/tools-call"
+  status = 200
+  force = true
+
+# Legacy routes for backward compatibility
 [[redirects]]
   from = "/mcp/v1/encode-plantuml"
   to = "/.netlify/functions/encode-plantuml"
   status = 200
   force = true
-  
+
 [[redirects]]
   from = "/mcp/*"
   to = "/.netlify/functions/:splat"
